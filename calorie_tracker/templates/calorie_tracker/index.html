@@ -1,0 +1,40 @@
+{% extends 'calorie_tracker/base.html' %}
+
+{% block content %}
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-700">Today: {{ today|date:"F j, Y" }}</h2>
+        <div class="flex justify-between items-center mt-2">
+            <span class="text-lg">Total calories: <strong>{{ total }}</strong> kcal</span>
+            <form action="{% url 'calorie_tracker:reset_today' %}" method="post" onsubmit="return confirm('Reset all today\'s entries?');">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Reset Today</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <form method="post" action="{% url 'calorie_tracker:index' %}" class="flex flex-col sm:flex-row gap-3">
+            {% csrf_token %}
+            {{ form.name }}
+            {{ form.calories }}
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg whitespace-nowrap">Add Item</button>
+        </form>
+    </div>
+
+    <div>
+        {% if items %}
+            <ul class="divide-y divide-gray-200">{% for item in items %}<li class="py-3 flex justify-between items-center">
+                <div>
+                    <span class="font-medium">{{ item.name }}</span>
+                    <span class="text-gray-600 ml-2">{{ item.calories }} kcal</span>
+                </div>
+                <form action="{% url 'calorie_tracker:delete_item' item.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-500 hover:text-red-700">✕ Remove</button>
+                </form>
+            </li>{% endfor %}</ul>
+        {% else %}
+            <p class="text-gray-500 text-center py-4">No items logged today.</p>
+        {% endif %}
+    </div>
+{% endblock %}
